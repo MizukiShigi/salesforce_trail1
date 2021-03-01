@@ -1,0 +1,19 @@
+<apex:page >
+    <apex:pageBlock title="User Status">
+        <apex:pageBlockSection columns="1">
+            {! $User.FirstName & ' ' & $User.LastName }
+			({! $User.UserName })
+            ({! if($user.isactive, $user.username, 'inactive')})
+        </apex:pageBlockSection>
+        <p> Today's Date is {! TODAY() } </p>
+		<p> Next week it will be {! TODAY() + 7 } </p>
+        <p>Is it true?  {! CONTAINS('salesforce.com', 'force.com') }</p>
+        
+        <p>{!if ( contains('saleceforce.com', 'force.com'),
+            'Yep', 'Nope')}</p>
+        <p>
+            {! if( day(today()) < 15,
+            'Before the 15th', 'The 15th or after')}
+        </p>
+    </apex:pageBlock>
+</apex:page>

@@ -1,0 +1,99 @@
+<apex:page controller="SearchAccountController" action="{!init}" sidebar="false" Id="AccountList" docType="html-5.0">
+
+<script type="text/javascript">
+    // ページを開いたときに初期フォーカスをしない
+    beenFocused = true;
+</script>
+<apex:form id="form1">
+    <apex:pageBlock title="取引先検索">
+        <apex:pageMessages id="messagearea" showDetail="true"/>
+        <apex:pageblockSection id="conditionSection" title="検索" columns="1">
+            <apex:outputpanel id="searchcondition">
+                <table id="conditionTable">
+                    <tr>
+                        <td class="label"><apex:outputLabel value="取引先名 ："  styleClass="labelCol" /></td>
+                        <td>
+                            <apex:input type="text" value="{!condition.searchName}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><apex:outputLabel value="商談種別 ："  styleClass="labelCol" /></td>
+                        <td>
+                            <apex:inputField value="{!condition.obj_opp.Type}"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><apex:outputLabel value="最終更新日 ：" styleClass="labelCol"/></td>
+                        <td>
+                            <apex:input type="date" value="{!condition.startDate}" />
+                            <apex:outputLabel value="　～ "  styleClass="labelCol" />
+                            <apex:input type="date" value="{!condition.endDate}" />
+                        </td>
+                    </tr>
+                </table>
+            </apex:outputpanel>
+        </apex:pageblockSection>
+        <apex:pageBlockButtons id="buttonSection" location="bottom" >
+            <apex:commandButton value="検索" action="{!search}" style="font-size:12pt;width:100px;height:30px;" reRender="searchresult,messagearea"/>
+            <apex:commandButton value="クリア" action="{!clear}" style="font-size:12pt;width:100px;height:30px;" reRender="searchcondition,searchresult,messagearea"/>
+        </apex:pageBlockButtons>
+    </apex:pageBlock>
+</apex:form>
+<apex:outputpanel id="searchresult">
+    <apex:pageBlock title="検索結果：" rendered="{!(results.size == 0)}">
+         検索条件に該当するデータがありません
+    </apex:pageBlock>
+
+    <apex:form id="resultForm">
+        <apex:pageBlock id="resultBlock" title="取引先一覧" rendered="{!(results.size > 0)}">
+            <apex:outputtext style="width:110px" value="結果 : {!results.size}件"/>
+            <apex:pageblockTable id="resultTable" value="{!results}" var="o" frame="box">
+                <apex:column style="width:70px">
+                    <apex:facet name="header">
+                        <apex:commandLink action="{!sort}" value="取引先名{!IF(sortkey == 'Name', sortOrder, ' ')}">
+                            <apex:param value="Name" name="String" assignTo="{!sortField}" />
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputField style="width:60px" value="{!o.Name}"/>
+                </apex:column>
+                <apex:column style="width:60px">
+                    <apex:facet name="header">
+                        <apex:commandLink action="{!sort}" value="電話番号{!IF(sortkey == 'AccountNumber', sortOrder, ' ')}">
+                            <apex:param value="AccountNumber" name="String" assignTo="{!sortField}" />
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputField style="width:60px" value="{!o.AccountNumber}"/>
+                </apex:column>
+                <apex:column style="width:60px">
+                    <apex:facet name="header">取引先責任者</apex:facet>
+                    <apex:outputField style="width:60px" rendered="{!IF(o.Contacts.size!=0,true,false)}" value="{!o.Contacts[0].Name}"/>
+                </apex:column>
+                <apex:column style="width:60px">
+                    <apex:facet name="header">商談名</apex:facet>
+                    <apex:outputField style="width:60px" rendered="{!IF(o.Opportunities.size!=0,true,false)}" value="{!o.Opportunities[0].Name}"/>
+                </apex:column>
+                <apex:column style="width:60px">
+                    <apex:facet name="header">商談進捗</apex:facet>
+                    <apex:outputField style="width:60px" rendered="{!IF(o.Opportunities.size!=0,true,false)}" value="{!o.Opportunities[0].StageName}"/>
+                </apex:column>
+                <apex:column style="width:60px">
+                    <apex:facet name="header">商談種別</apex:facet>
+                    <apex:outputField style="width:60px" rendered="{!IF(o.Opportunities.size!=0,true,false)}" value="{!o.Opportunities[0].Type}"/>
+                </apex:column>
+                <apex:column style="width:60px">
+                    <apex:facet name="header">
+                        <apex:commandLink action="{!sort}" value="取引先最終更新日時{!IF(sortKey == 'LastModifiedDate', sortOrder, '　')}">
+                            <apex:param value="LastModifiedDate" name="String" assignTo="{!sortField}" />
+                        </apex:commandLink>
+                    </apex:facet> 
+                    <apex:outputField style="width:60px" value="{!o.LastModifiedDate}"/>
+                </apex:column>
+                <apex:column style="width:30px">
+                    <apex:facet name="header">詳細ページ</apex:facet> 
+                    <apex:commandLink style="width:60px" action="{!URLFOR('/' + o.Id)}">詳細</apex:commandLink>
+                </apex:column>
+            </apex:pageblockTable>
+        </apex:pageBlock>
+    </apex:form>
+</apex:outputpanel>
+</apex:page>
